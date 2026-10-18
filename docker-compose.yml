@@ -1,0 +1,28 @@
+# Same suite, no local toolchain: `docker compose run --rm tests` / `docker compose run --rm k6`.
+# Override targets with API_BASE_URL / CONTRACT_* / K6_* in the environment or a .env file.
+services:
+  tests:
+    build: .
+    image: api-quality-toolkit:local
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-https://restful-booker.herokuapp.com}
+      CONTRACT_SCHEMA_URL: ${CONTRACT_SCHEMA_URL:-https://petstore3.swagger.io/api/v3/openapi.json}
+      CONTRACT_BASE_URL: ${CONTRACT_BASE_URL:-https://petstore3.swagger.io/api/v3}
+      CONTRACT_MAX_EXAMPLES: ${CONTRACT_MAX_EXAMPLES:-15}
+    volumes:
+      - ./reports:/app/reports
+    # default: smoke; e.g. `docker compose run --rm tests tests -q --junitxml=reports/junit.xml`
+
+  k6:
+    image: grafana/k6:1.1.0
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-https://restful-booker.herokuapp.com}
+      K6_P95_MS: ${K6_P95_MS:-1500}
+      K6_ERROR_RATE: ${K6_ERROR_RATE:-0.02}
+      K6_VUS: ${K6_VUS:-5}
+      K6_DURATION: ${K6_DURATION:-30s}
+    volumes:
+      - ./perf:/perf:ro
+      - ./reports:/reports
+    working_dir: /
+    command: ["run", "--summary-export=/reports/k6-summary.json", "/perf/k6/smoke.js"]
