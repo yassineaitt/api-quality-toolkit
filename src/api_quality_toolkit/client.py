@@ -1,4 +1,4 @@
-"""A small httpx wrapper: base URL, JSON headers, token handling, timing.
+"""A small httpx wrapper: base URL, JSON headers, token handling.
 
 It returns raw ``httpx.Response`` objects so tests own every assertion; the only
 behaviour it adds is the restful-booker auth convention (token cookie on writes).
@@ -27,7 +27,6 @@ class BookingClient:
                 base_url=str(self.settings.api_base_url).rstrip("/"),
                 headers={"Accept": "application/json"},
                 timeout=self.settings.timeout_s,
-                event_hooks={"response": [_record_timing]},
             )
         return self._http
 
@@ -83,8 +82,6 @@ class BookingClient:
         return self.http.delete(f"/booking/{booking_id}", headers=self._auth_headers)
 
 
-def _record_timing(response: httpx.Response) -> None:
-    """Expose server time on the response for latency assertions in tests."""
-    response.extensions["elapsed_ms"] = (
-        response.elapsed.total_seconds() * 1000 if response.elapsed else 0.0
-    )
+def elapsed_ms(response: httpx.Response) -> float:
+    """Wall-clock time of a completed (fully read) response, for latency assertions."""
+    return response.elapsed.total_seconds() * 1000

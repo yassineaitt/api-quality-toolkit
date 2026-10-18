@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
 SCHEMA_DIR = Path(__file__).resolve().parents[2] / "schemas"
 
@@ -25,8 +26,22 @@ def load_schema(name: str) -> dict[str, Any]:
     return schema
 
 
+@cache
+def registry() -> Registry[Any]:
+    """All schemas in the directory, so `$ref: "<file>.schema.json"` resolves offline."""
+    resources = [
+        (path.name, Resource.from_contents(json.loads(path.read_text(encoding="utf-8"))))
+        for path in sorted(SCHEMA_DIR.glob("*.schema.json"))
+    ]
+    reg: Registry[Any] = Registry()
+    for name, resource in resources:
+        reg = reg.with_resource(uri=name, resource=resource)
+        reg = reg.with_resource(uri=str(resource.contents.get("$id", name)), resource=resource)
+    return reg
+
+
 def violations(instance: Any, schema_name: str) -> list[str]:
-    validator = Draft202012Validator(load_schema(schema_name))
+    validator = Draft202012Validator(load_schema(schema_name), registry=registry())
     out: list[str] = []
     for err in sorted(validator.iter_errors(instance), key=lambda e: list(e.absolute_path)):
         where = "/".join(str(p) for p in err.absolute_path) or "<root>"
