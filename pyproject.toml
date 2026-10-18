@@ -1,0 +1,61 @@
+[project]
+name = "api-quality-toolkit"
+version = "0.1.0"
+description = "API quality toolkit: pytest + httpx functional tests with JSON Schema validation, Schemathesis contract tests from OpenAPI, and a k6 performance smoke with build-failing thresholds. Same suite runs locally, in Docker and in CI."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Yassine Ait Tamarmoucht" }]
+requires-python = ">=3.12"
+keywords = ["api-testing", "pytest", "httpx", "schemathesis", "k6", "contract-testing", "json-schema"]
+dependencies = [
+  "httpx>=0.28",
+  "jsonschema>=4.23",
+  "pydantic>=2.11",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4",
+  "pytest-xdist>=3.8",
+  "schemathesis>=4.0",
+  "hypothesis>=6.130",
+  "ruff>=0.12",
+  "mypy>=1.17",
+  "types-jsonschema",
+  "pre-commit>=4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/api_quality_toolkit"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "PT", "RET", "RUF", "ANN", "S", "T20", "PL"]
+ignore = ["ANN401", "S101", "PLR2004"]
+per-file-ignores = { "tests/**" = ["S", "ANN", "PLR0913"] }
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["api_quality_toolkit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+  "smoke: fast, must-pass checks run on every push",
+  "regression: broader deterministic coverage",
+  "contract: Schemathesis property-based checks against an OpenAPI spec",
+  "destructive: creates or deletes data on the target",
+]
+xfail_strict = true
+filterwarnings = ["error", "ignore::DeprecationWarning", "ignore::pytest.PytestUnraisableExceptionWarning"]
