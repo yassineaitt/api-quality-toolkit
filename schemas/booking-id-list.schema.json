@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yassineaitt/api-quality-toolkit/schemas/booking-id-list.schema.json",
+  "title": "BookingIdList",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["bookingid"],
+    "additionalProperties": false,
+    "properties": { "bookingid": { "type": "integer", "minimum": 1 } }
+  }
+}

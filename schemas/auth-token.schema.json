@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yassineaitt/api-quality-toolkit/schemas/auth-token.schema.json",
+  "title": "AuthToken",
+  "type": "object",
+  "required": ["token"],
+  "additionalProperties": false,
+  "properties": { "token": { "type": "string", "pattern": "^[a-f0-9]{15}$" } }
+}
