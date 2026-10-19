@@ -6,9 +6,9 @@ import json
 
 import httpx
 import pytest
-from tests.contract.known_gaps import KNOWN_GAPS, Gap
 
 from api_quality_toolkit.config import settings
+from tests.contract.known_gaps import KNOWN_GAPS, Gap
 
 pytestmark = pytest.mark.contract
 

@@ -14,9 +14,9 @@ from hypothesis import HealthCheck, Phase
 from hypothesis import settings as hypothesis_settings
 from schemathesis.checks import CHECKS
 from schemathesis.generation import GenerationMode
-from tests.contract.known_gaps import KNOWN_GAP_PATHS
 
 from api_quality_toolkit.config import settings
+from tests.contract.known_gaps import KNOWN_GAP_PATHS
 
 # What "honouring the contract" means here: declared status codes, declared content types,
 # bodies that validate against the response schema, and never a 5xx. Positive data only -
