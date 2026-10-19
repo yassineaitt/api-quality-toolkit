@@ -7,5 +7,5 @@
 .ruff_cache
 reports
 htmlcov
-*.md
 docs
+CONTRIBUTING.md
