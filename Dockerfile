@@ -16,6 +16,7 @@ COPY pyproject.toml uv.lock ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --locked --no-install-project
 
 # Source layer
+COPY README.md ./
 COPY src ./src
 COPY schemas ./schemas
 COPY tests ./tests
